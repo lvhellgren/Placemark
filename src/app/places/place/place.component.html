@@ -1,0 +1,230 @@
+<div class="place" [style.height]="'100%'"
+     fxLayoutAlign="center"
+     fxLayout="column">
+  <form fxFlex.gt-xs="400px"
+        fxLayout="column"
+        [formGroup]="placeForm">
+    <div class="box mat-elevation-z4">
+      <div fxLayout="row" fxLayoutAlign="space-between center">
+        <mat-form-field floatLabel="always">
+          <input type="text"
+                 required
+                 matInput
+                 placeholder="Name"
+                 formControlName="name">
+        </mat-form-field>
+        <div class="lookup-button" fxLayoutAlign="space-around center">
+          <button color="primary"
+                  mat-flat-button
+                  [disabled]="!canLookup"
+                  (click)="onLookupClick()">
+            Lookup Place
+          </button>
+        </div>
+      </div>
+      <div fxLayout="row">
+        <mat-form-field fxFlex="50">
+          <mat-label class="icon-name">Icon Kit</mat-label>
+          <mat-select [(value)]="selectedIconKit"
+                      formControlName="iconKit"
+                      (selectionChange)="onIconKitChange($event)">
+            <mat-option *ngFor="let kit of iconKits" [value]="kit.filePath">
+              {{kit.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field fxFlex="50">
+          <mat-label class="icon-name">Icon</mat-label>
+          <mat-select [(value)]="selectedIconName"
+                      formControlName="iconName"
+                      (selectionChange)="onIconNameChange($event)">
+            <mat-option *ngFor="let icon of iconKit" [value]="icon.id">
+              {{icon.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field floatLabel="always" fxFlex="100">
+              <textarea
+                matInput
+                rows="1"
+                placeholder="Info Window"
+                formControlName="infoWindowContent">
+              </textarea>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="box mat-elevation-z4"
+         formGroupName="addressForm"
+         fxLayout="column">
+      <mat-form-field floatLabel="always">
+              <textarea
+                matInput
+                rows="1"
+                placeholder="Address"
+                formControlName="address">
+              </textarea>
+      </mat-form-field>
+      <div fxFlex="25"
+           fxLayout="row"
+           fxLayoutAlign="center center">
+        <button color="primary"
+                mat-flat-button
+                [disabled]="!canCreateByAddress"
+                (click)="onCreateByAddressClick()">
+          Create New Place
+        </button>
+      </div>
+    </div>
+
+    <div class="box mat-elevation-z4"
+         formGroupName="coordinatesForm"
+         fxLayout="column">
+      <div fxLayout="row">
+        <mat-form-field floatLabel="always" fxFlex="50">
+          <input type="number"
+                 matInput
+                 required
+                 placeholder="Latitude"
+                 formControlName="latitude">
+          <mat-error>Missing Latitude.</mat-error>
+        </mat-form-field>
+        <mat-form-field floatLabel="always" fxFlex="50">
+          <input type="number"
+                 matInput
+                 required
+                 placeholder="Longitude"
+                 formControlName="longitude">
+          <mat-error>Missing Longitude.</mat-error>
+        </mat-form-field>
+      </div>
+      <div fxFlex="25"
+           fxLayout="row"
+           fxLayoutAlign="center center">
+        <button color="primary"
+                mat-flat-button
+                [disabled]="!canCreateByCoordinates"
+                (click)="onCreateByCoordinatesClick()">
+          Create New Place
+        </button>
+      </div>
+    </div>
+
+    <div class="box mat-elevation-z4"
+         fxLayout="column"
+         formGroupName="fencesForm">
+      <div fxLayout="row">
+        <mat-form-field floatLabel="always" fxFlex="50">
+          <mat-label>Fence IDs</mat-label>
+          <mat-select [(value)]="selectedFenceId"
+                      formControlName="fenceIds"
+                      (selectionChange)="onFenceIdChange($event)">
+            <mat-option *ngFor="let id of fenceIds" [value]="id">
+              {{id}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field floatLabel="always" fxFlex="50">
+          <input type="text"
+                 matInput
+                 placeholder="Add Fence ID"
+                 formControlName="fenceId">
+        </mat-form-field>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="start center">
+        <mat-form-field floatLabel="always">
+          <input type="number"
+                 matInput
+                 placeholder="Radius (meters)"
+                 formControlName="radius">
+        </mat-form-field>
+        <mat-checkbox class="fence-visible"
+                      checked="fenceVisible"
+                      labelPosition="before">
+          Visible
+        </mat-checkbox>
+      </div>
+      <div fxLayout="row">
+        <mat-form-field floatLabel="always">
+          <input type="text"
+                 matInput
+                 placeholder="Fill Color"
+                 formControlName="fillColor">
+        </mat-form-field>
+        <mat-form-field floatLabel="always" fxFlex="50">
+          <input type="number"
+                 matInput
+                 placeholder="Opacity (0.0 - 1.0)"
+                 formControlName="fillOpacity">
+        </mat-form-field>
+      </div>
+      <div fxLayout="row">
+        <mat-form-field floatLabel="always">
+          <input type="text"
+                 matInput
+                 placeholder="Stroke Color"
+                 formControlName="strokeColor">
+        </mat-form-field>
+        <div fxLayout="row" fxFlex="50">
+          <mat-form-field class="stroke-opacity" floatLabel="always">
+            <input type="number"
+                   matInput
+                   placeholder="Opacity (0.0 - 1.0)"
+                   formControlName="strokeOpacity">
+          </mat-form-field>
+          <mat-form-field class="stroke-weight" floatLabel="always">
+            <input type="number"
+                   matInput
+                   placeholder="Weight"
+                   formControlName="strokeWeight">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div fxLayout="row" fxLayoutAlign="space-evenly center">
+        <button [ngClass]="'fence-button'"
+                color="primary"
+                mat-flat-button
+                (click)="onDeleteGeofenceClick()"
+                [disabled]="!canDeleteGeofence">
+          Delete
+        </button>
+        <button [ngClass]="'fence-button'"
+                color="primary"
+                mat-flat-button
+                (click)="onApplyGeofenceClick()"
+                [disabled]="!canApplyGeofence">
+          Apply
+        </button>
+      </div>
+    </div>
+
+    <div class="buttons"
+         fxLayout="row"
+         fxLayoutAlign="space-around start">
+      <button class="button"
+              mat-raised-button
+              color="primary"
+              [disabled]="!canCancel"
+              (click)="onCancel()">
+        Cancel
+      </button>
+      <button class="button"
+              mat-raised-button
+              color="primary"
+              [disabled]="!canDelete"
+              (click)="onDelete()">
+        DELETE
+      </button>
+      <button class="button"
+              mat-raised-button
+              color="primary"
+              [disabled]="!canSave"
+              (click)="onSave()">
+        SAVE
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,3 +1,47 @@
-<h3>App Component</h3>
+<div fxLayout="column"
+     fxLayoutGap="1px"
+     fxLayoutAlign="space-between stretch">
+  <div fxFlexOrder="1">
+    <mat-toolbar id="navbar-container" color="primary"
+                 fxFlex="100%"
+                 fxLayout="row"
+                 fxLayoutAlign="space-between center">
+      <div class="page-row"
+           fxFlexOrder="1"
+           fxLayout="row"
+           fxLayoutGap="20px"
+           fxLayoutAlign="space-around end">
+        <div>
+          <a href="#" mat-button
+             [routerLink]="['places']"
+             [routerLinkActive]="['active-page']"
+             matTooltip="Marked locations">
+            PLACES
+          </a>
+        </div>
+        <div>
+          <a href="#" mat-button
+             [routerLink]="['icons']"
+             [routerLinkActive]="['active-page']"
+             matTooltip="Icon definitions">
+            ICONS
+          </a>
+        </div>
+      </div>
+      <div fxFlexOrder="2"
+           style="padding-right: 15px">
+        <button mat-icon-button matTooltip="Information" (click)="onInfoBtnClick()">
+          <mat-icon>help</mat-icon>
+        </button>
+      </div>
+    </mat-toolbar>
+  </div>
+  <div class="content" fxFlexOrder="2">
+    <router-outlet></router-outlet>
+  </div>
+  <div class="footer"
+       fxFlexOrder="3">
+    lars@exelor.com
+  </div>
+</div>
 
-<router-outlet></router-outlet>

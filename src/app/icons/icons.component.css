@@ -1,0 +1,14 @@
+
+.icons {
+}
+
+.left-panel {
+  width: 400px;
+  padding: 10px;
+  background-color: lightgray;
+}
+
+#icons-map {
+  width: 100%;
+  margin-left: 8px;
+}

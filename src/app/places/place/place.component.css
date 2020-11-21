@@ -1,0 +1,61 @@
+.place {
+  margin-top: 20px;
+}
+
+form {
+  width: 100%;
+}
+
+.box {
+  margin-bottom: 15px;
+  padding: 10px 0 10px 5px;
+}
+
+.place-name {
+  margin-bottom: 15px;
+  padding: 10px 0 5px 5px;
+}
+
+.lookup-button {
+  width: 100%;
+}
+mat-form-field {
+  padding-right: 5px;
+}
+
+.icon-name {
+  font-size: smaller;
+  color: gray;
+}
+
+.fence-visible {
+  margin-left: 10px;
+  font-size: 12px;
+  color: gray;
+}
+
+.stroke-opacity, .stroke-weight {
+  width: 95px;
+}
+
+.stroke-weight {
+  margin-left: 10px;
+}
+
+.fence-button {
+  font-size: small;
+  width: 150px;
+  margin: 10px 10px 10px 5px;
+}
+
+.place-buttons {
+  padding: 10px 0 20px 5px;
+}
+
+.buttons {
+  margin-top: 10px;
+}
+
+.button {
+  width: 85px;
+}
