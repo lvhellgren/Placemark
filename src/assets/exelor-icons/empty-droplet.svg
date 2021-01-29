@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="40" height="50" viewBox="0 0 200 245"
+     data-markerType="overlay" data-origin="exelor"
+     xmlns="http://www.w3.org/2000/svg">
+  <style id="style" type="text/css">
+    .path-1 {
+      fill: skyblue;
+      stroke: black;
+      stroke-width: 2
+    }
+    .path-2 {
+      fill: whitesmoke;
+      stroke: black;
+      stroke-width: 2
+    }
+  </style>
+  <path id="path" class="path-1"
+        d="M 196 100 C 196 118.893 190.542 136.511 181.117 151.365 C 164.094 178.193 100 240 100 240 C 100 240 34.428 177.302 17.645 149.359 C 8.982 134.936 4 118.05 4 100 C 4 46.981 46.981 4 100 4 C 153.019 4 196 46.981 196 100 Z"/>
+  <circle class="path-2" cx="100" cy="100" r="80"/>
+</svg>

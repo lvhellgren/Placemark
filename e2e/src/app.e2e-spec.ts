@@ -10,7 +10,7 @@ describe('workspace-project App', () => {
 
   it('should display welcome message', () => {
     page.navigateTo();
-    expect(page.getTitleText()).toEqual('Map-SVG-Icons app is running!');
+    expect(page.getTitleText()).toEqual('Placemark app is running!');
   });
 
   afterEach(async () => {

@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "Map-SVG-Icons": {
+    "Placemark": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/Map-SVG-Icons",
+            "outputPath": "dist/Placemark",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -40,7 +40,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "extractLicenses": true,
               "vendorChunk": false,
@@ -63,18 +62,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "Map-SVG-Icons:build"
+            "browserTarget": "Placemark:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "Map-SVG-Icons:build:production"
+              "browserTarget": "Placemark:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "Map-SVG-Icons:build"
+            "browserTarget": "Placemark:build"
           }
         },
         "test": {
@@ -112,18 +111,18 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "Map-SVG-Icons:serve"
+            "devServerTarget": "Placemark:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "Map-SVG-Icons:serve:production"
+              "devServerTarget": "Placemark:serve:production"
             }
           }
         }
       }
     }
   },
-  "defaultProject": "Map-SVG-Icons",
+  "defaultProject": "Placemark",
   "cli": {
     "analytics": "f5502a9e-6e6c-4606-80a0-ec028ca32287"
   }

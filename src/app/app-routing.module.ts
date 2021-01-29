@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Lars Hellgren (lars@exelor.com).
+// Copyright (c) 2021 Lars Hellgren (lars@exelor.com).
 // All rights reserved.
 //
 // This code is licensed under the MIT License.
@@ -28,12 +28,12 @@ import { RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'places',
+    redirectTo: 'icon',
     pathMatch: 'full'
   },
   {
-    path: 'icons',
-    loadChildren: () => import('./icons/icons.module').then(m => m.IconsModule)
+    path: 'icon',
+    loadChildren: () => import('./icons/icon.module').then(m => m.IconModule)
   },
   { path: 'places',
     loadChildren: () => import('./places/places.module').then(m => m.PlacesModule)
@@ -46,10 +46,8 @@ const routes: Routes = [
     RouterModule.forRoot(
       routes,
       {
-        // enableTracing: true,
-        // Load lazy modules in the background
-        // preloadingStrategy: PreloadAllModules
-      })
+    relativeLinkResolution: 'legacy'
+})
   ],
   exports: [RouterModule],
   providers: []

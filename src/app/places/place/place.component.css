@@ -19,6 +19,13 @@ form {
 .lookup-button {
   width: 100%;
 }
+
+.custom-icon {
+  font-size: 10px;
+  color: gray;
+  margin-bottom: 10px;
+}
+
 mat-form-field {
   padding-right: 5px;
 }
@@ -30,16 +37,8 @@ mat-form-field {
 
 .fence-visible {
   margin-left: 10px;
-  font-size: 12px;
+  font-size: 10px;
   color: gray;
-}
-
-.stroke-opacity, .stroke-weight {
-  width: 95px;
-}
-
-.stroke-weight {
-  margin-left: 10px;
 }
 
 .fence-button {

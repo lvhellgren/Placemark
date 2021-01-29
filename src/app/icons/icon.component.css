@@ -1,0 +1,41 @@
+
+.icon {
+  margin-top: 20px;
+}
+
+.heading {
+  font-size: larger;
+  color: slategray;
+  margin-bottom: 20px;
+}
+
+form {
+  width: 100%;
+}
+
+.group {
+  margin-top: 5px;
+  margin-bottom: 10px;
+  padding: 8px;
+  border-width: 1px;
+}
+
+legend {
+  font-size: smaller;
+  color: gray;
+  margin-bottom: 5px;
+}
+
+mat-form-field {
+  padding-left: 2px;
+  padding-right: 5px;
+}
+
+.icon-buttons {
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+
+.icon-button {
+  width: 85px;
+}

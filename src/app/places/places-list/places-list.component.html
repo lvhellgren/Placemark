@@ -1,7 +1,33 @@
 <div class="list" fxLayout="column" fxFlex>
   <div class="table mat-elevation-z4"
+       fxLayout="column"
+       fxLayoutAlign="end"
        fxFlexFill>
+    <div class="select-all">
+      <mat-checkbox [checked]="isAllSelectedChecked"
+                    [indeterminate]="isAllSelectedIndeterminate"
+                    (change)="onSelectAllChange($event)">
+        <button mat-button
+           (click)="onDeletePlacesClick()"
+           [disabled]="disableDelete">
+          Delete
+        </button>
+      </mat-checkbox>
+    </div>
     <mat-table class="table-responsive" [dataSource]="dataSource" matSort>
+
+      <!-- Checkbox Column -->
+      <ng-container matColumnDef="select">
+        <mat-header-cell *matHeaderCellDef mat-sort-header></mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <mat-checkbox
+            [checked]="isAllSelectedChecked"
+            [id]="getPlaceId(row)"
+            (change)="onSelectRowChange($event)">
+          </mat-checkbox>
+        </mat-cell>
+      </ng-container>
+
       <!-- Name Column -->
       <ng-container matColumnDef="name">
         <mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Name</mat-header-cell>
@@ -12,6 +38,29 @@
           &nbsp;{{row.name}}
         </mat-cell>
       </ng-container>
+
+      <!-- Icon Set Column -->
+      <ng-container matColumnDef="iconSet">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Icon Set</mat-header-cell>
+        <mat-cell *matCellDef="let row"
+                  [style.color]="rowColor(row)"
+                  (click)="onRowClick(row)"
+                  (dblclick)="onRowDblclick(row)">
+          &nbsp;{{getIconSetName(row)}}
+        </mat-cell>
+      </ng-container>
+
+      <!-- Icon Column -->
+      <ng-container matColumnDef="icon">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>&nbsp;Icon</mat-header-cell>
+        <mat-cell *matCellDef="let row"
+                  [style.color]="rowColor(row)"
+                  (click)="onRowClick(row)"
+                  (dblclick)="onRowDblclick(row)">
+          &nbsp;{{getIconName(row)}}
+        </mat-cell>
+      </ng-container>
+
       <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
       <mat-row *matRowDef="let row; columns: displayedColumns;"
                [style.background]="rowBackground(row)">

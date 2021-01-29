@@ -1,0 +1,45 @@
+<div>
+  <form fxLayout="column"
+        [formGroup]="styleForm">
+    <div fxLayout="row"
+         fxLayoutAlign="space-between center">
+      <mat-form-field>
+        <mat-select formControlName="selectedIconDef"
+                    placeholder="Icon"
+                    #singleSelect>
+          <mat-option>
+            <ngx-mat-select-search formControlName="iconFilter"
+                                   placeholderLabel="Filter"
+                                   noEntriesFoundLabel="No matches found">
+            </ngx-mat-select-search>
+          </mat-option>
+          <mat-option *ngFor="let iconDef of iconDefs" [value]="iconDef">
+            {{iconDef[0]}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field fxFlex="50" floatLabel="always">
+        <input type="text"
+               matInput
+               placeholder="Color"
+               formControlName="color"
+               (change)="onColorChange($event)">
+      </mat-form-field>
+    </div>
+    <div fxLayout="row"
+         fxLayoutAlign="space-between center">
+      <mat-form-field fxFlex="50" floatLabel="always">
+        <input type="number"
+               matInput
+               placeholder="Horizontal Adjustment"
+               formControlName="xOffset">
+      </mat-form-field>
+      <mat-form-field fxFlex="50" floatLabel="always">
+        <input type="number"
+               matInput
+               placeholder="Vertical Adjustment"
+               formControlName="yOffset">
+      </mat-form-field>
+    </div>
+  </form>
+</div>

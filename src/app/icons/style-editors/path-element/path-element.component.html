@@ -1,0 +1,48 @@
+<div>
+  <form fxLayout="column"
+        [formGroup]="styleForm">
+    <div fxLayout="row"
+         fxLayoutAlign="space-between center">
+      <mat-form-field fxFlex="50" floatLabel="always">
+        <input type="string"
+               matInput
+               placeholder="Fill Color"
+               formControlName="fillColor"
+               (change)="onFillColorChange($event)">
+      </mat-form-field>
+      <mat-form-field fxFlex="50" floatLabel="always">
+        <input type="number"
+               matInput
+               placeholder="Fill Opacity (0.0 - 1)"
+               formControlName="fillOpacity"
+               (change)="onFillOpacityChange($event)">
+      </mat-form-field>
+    </div>
+    <div fxLayout="row"
+         fxLayoutAlign="space-between center">
+      <mat-form-field fxFlex="50" floatLabel="always">
+        <input type="string"
+               matInput
+               placeholder="Stroke Color"
+               formControlName="strokeColor"
+               (change)="onStrokeColorChange($event)">
+      </mat-form-field>
+      <mat-form-field fxFlex="50" floatLabel="always">
+        <input type="number"
+               matInput
+               placeholder="Stroke Opacity (0.0 - 1)"
+               formControlName="strokeOpacity"
+               (change)="onStrokeOpacityChange($event)">
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field fxFlex="50" floatLabel="always">
+        <input type="number"
+               matInput
+               placeholder="Stroke Width"
+               formControlName="strokeWidth"
+               (change)="onStrokeWidthChange($event)">
+      </mat-form-field>
+    </div>
+  </form>
+</div>

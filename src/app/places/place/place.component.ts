@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Lars Hellgren (lars@exelor.com).
+// Copyright (c) 2021 Lars Hellgren (lars@exelor.com).
 // All rights reserved.
 //
 // This code is licensed under the MIT License.
@@ -23,14 +23,16 @@
 
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Geofence, ICON_KITS, Place } from '../classes/place';
+import { Geofence, Place } from '../classes/place';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PlacesService } from '../places.service';
+import { ICON_TEMPLATE_SETS, PlacesService, SvgIconHolder } from '../places.service';
 import { SubSink } from 'subsink';
-import { ErrorDlgComponent } from '../../error-dlg/error-dlg.component';
+import { ErrorDlgComponent } from '../../common/error-dlg/error-dlg.component';
 import { MatDialog } from '@angular/material/dialog';
 import LatLng = google.maps.LatLng;
-import { SvgLoadService, SvgWrapper } from '../../services/svg-load.service';
+import { SvgIcon } from '../../services/svg-icon';
+import { CustomIconStoreService } from '../../services/custom-icon-store.service';
+import { IconSet } from '../../services/template-icon-store.service';
 
 @Component({
   selector: 'app-place',
@@ -38,21 +40,25 @@ import { SvgLoadService, SvgWrapper } from '../../services/svg-load.service';
   styleUrls: ['./place.component.css']
 })
 export class PlaceComponent implements OnInit, OnDestroy, AfterViewInit {
-  static FENCES_FORM = 'fencesForm';
+  private readonly lookupPlace = 'Lookup Place';
+  private readonly endLookup = 'Cancel Lookup';
 
   public placeForm: FormGroup;
 
   public canLookup = false;
+  public canApplyIconContent = false;
   public canCreateByCoordinates = false;
   public canCreateByAddress = false;
   public canCancel = true;
   public canDelete: boolean;
   public canSave: boolean;
 
-  public iconKits: { name: string, collection: { name: string, id: string }[], filePath: string }[] = ICON_KITS;
-  public iconKit: { id: string, name: string }[];
-  public selectedIconKit: string;
-  public selectedIconName;
+  public isCustomIconSet = false;
+  public customIconSetDisabled = true;
+  public iconSets: IconSet[] = ICON_TEMPLATE_SETS;
+  public iconSet: { id: string, name: string }[];
+  public selectedIconSet: string;
+  public selectedIconName: string;
 
   public fenceIds: string[] = [];
   public selectedFenceId: string;
@@ -60,23 +66,27 @@ export class PlaceComponent implements OnInit, OnDestroy, AfterViewInit {
   public canEnterGeofence = false;
   public canApplyGeofence = false;
   public canDeleteGeofence = false;
+
   public fenceVisible = true;
+  public fenceDisabled = true;
 
 
   private place: Place;
+  private svgIcon: SvgIcon = null;
   private subSink = new SubSink();
 
   constructor(private placesService: PlacesService,
-              private svgLoadService: SvgLoadService,
+              private customIconStoreService: CustomIconStoreService,
               private fb: FormBuilder,
               private dialog: MatDialog,
               private route: ActivatedRoute,
               private router: Router) {
     this.placeForm = this.fb.group({
       name: [''],
-      iconKit: [''],
-      iconName: [''],
-      infoWindowContent: [''],
+      iconSet: [{value: '', disabled: true}],
+      iconName: [{value: '', disabled: true}],
+      iconTextContent: [{value: '', disabled: true}],
+      infoWindowContent: [{value: '', disabled: true}],
       coordinatesForm: this.fb.group({
         latitude: ['', [Validators.required]],
         longitude: ['', [Validators.required]],
@@ -97,7 +107,7 @@ export class PlaceComponent implements OnInit, OnDestroy, AfterViewInit {
       }),
     });
 
-    this.placeForm.controls[PlaceComponent.FENCES_FORM].disable({emitEvent: false});
+    this.placeForm.controls.fencesForm.disable({emitEvent: false});
   }
 
   ngOnInit(): void {
@@ -105,24 +115,71 @@ export class PlaceComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subSink.sink = this.placesService.placeChanged$.subscribe((place: Place) => {
       this.place = place;
       if (!!place) {
+        if (place.marker.getIcon()) {
+          this.svgIcon = new SvgIcon(place.marker.getIcon());
+        }
+        this.canSave = place.needsSaving();
         this.canDelete = this.canEnterGeofence = place.isSaved();
         this.fillPlaceForm(place, this.placeForm);
 
-        if (this.place.isSaved()) {
-          this.placeForm.controls[PlaceComponent.FENCES_FORM].enable({emitEvent: false});
+        if (place.isSaved()) {
+          this.placeForm.controls.fencesForm.enable({emitEvent: false});
+          this.fenceDisabled = false;
         }
+
+        this.enableIconFields(true);
+        if (place.hasIconTextContent) {
+          this.placeForm.controls.iconTextContent.enable({emitEvent: false});
+        } else {
+          this.placeForm.controls.iconTextContent.disable({emitEvent: false});
+        }
+
+        if (!!!place.marker.getIcon()) {
+          this.setDefaultIcon();
+        }
+      } else {
+        this.enableIconFields(false);
+      }
+    });
+
+    this.subSink.sink = this.customIconStoreService.iconSetsFetched$.subscribe((sets: IconSet[]) => {
+      if (!!sets && sets.length > 0) {
+        this.iconSets = sets;
       }
     });
   }
 
   ngAfterViewInit(): void {
+    // Reacts to a new icon having been loaded
+    this.subSink.sink = this.placesService.iconChanged$.subscribe((holder: SvgIconHolder) => {
+      if (!!holder) {
+        this.svgIcon = new SvgIcon(holder.svgText);
+        this.svgIcon.setSvgId(this.place.getId());
+        this.place.setIconSetId(holder.iconSetId);
+        this.place.setIconId(holder.iconId);
+      } else {
+        this.svgIcon = null;
+      }
+      this.place.setMarker(this.svgIcon);
+      this.placesService.placeChanged.next(this.place);
+    });
+
     // Reacts to UI name field value change
     this.subSink.sink = this.placeForm.controls.name.valueChanges.subscribe((name) => {
       this.canLookup = !!name && name.trim().length > 0;
       if (!!this.place) {
         this.place.setName(name);
-        this.canSave = this.place.isTutched() && !!this.place.getPosition();
-        this.placeForm.controls[PlaceComponent.FENCES_FORM].enable({emitEvent: false});
+        this.canSave = this.place.needsSaving();
+        this.placeForm.controls.fencesForm.enable({emitEvent: false});
+        this.fenceDisabled = false;
+      }
+    });
+
+    // Reacts to UI icon text parameter value change
+    this.subSink.sink = this.placeForm.controls.iconTextContent.valueChanges.subscribe((content) => {
+      if (!!this.place) {
+        this.place.setIconTextContent(content);
+        this.canApplyIconContent = true;
       }
     });
 
@@ -130,7 +187,7 @@ export class PlaceComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subSink.sink = this.placeForm.controls.infoWindowContent.valueChanges.subscribe((content) => {
       if (!!this.place) {
         this.place.setInfoWindowContent(content);
-        this.canSave = this.place.isTutched() && !!this.place.getPosition();
+        this.canSave = this.place.needsSaving();
         this.canEnterGeofence = this.canSave;
       }
     });
@@ -162,7 +219,7 @@ export class PlaceComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // Reacts to unsuccessful place savings operations
     this.subSink.sink = this.placesService.placeNotSaved$.subscribe((id: string) => {
-      if (!!id && !!this.place && id === this.place.getId()) {
+      if (!this.place.isSaved() && !!id && !!this.place && id === this.place.getId()) {
         if (confirm(`A place with name ${this.place.getName()} already exists. Do you still want to use this name?`)) {
           this.placesService.savePlace(this.place);
           this.savePlaceFinish(this.place);
@@ -175,12 +232,7 @@ export class PlaceComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // Subscriber for initializing the place form with a place definition on marker double-click.
     this.subSink.sink = this.placesService.markerDblclick.subscribe((place: Place) => {
-      this.fillPlaceForm(place, this.placeForm);
-    });
-
-    // Reacts to a new SVG document having been loaded.
-    this.subSink.sink = this.svgLoadService.svgLoaded$.subscribe((svgWrapper: SvgWrapper) => {
-      console.dir(svgWrapper);
+      this.placesService.placeChanged.next(place);
     });
   }
 
@@ -190,9 +242,14 @@ export class PlaceComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private fillPlaceForm(place: Place, placeForm: FormGroup): void {
     if (!!place) {
+      setTimeout(() => {}); // Skip one thread cycle
       this.canLookup = !!place.getName();
+      this.setIconSets(place.getIsCustomIconSet());
       placeForm.patchValue({
         name: place.getName(),
+        iconSetId: place.getIconSetId(),
+        iconId: place.getIconId(),
+        iconTextContent: place.iconTextContent,
         infoWindowContent: place.infoWindowContent
       }, {emitEvent: false});
 
@@ -210,26 +267,101 @@ export class PlaceComponent implements OnInit, OnDestroy, AfterViewInit {
           }
         }, {emitEvent: false});
 
-        this.fillFencesForm(this.place, this.placeForm);
+        this.fillFencesForm(place, this.placeForm);
       } else {
         placeForm.reset({}, {emitEvent: false});
       }
+
+      // Skip a cycle before setting the current selection
+      setTimeout(() => {
+        if (!!place.getIconSetId()) {
+          this.setIconSet(place.getIconSetId());
+          this.selectedIconSet = place.getIconSetId();
+        }
+
+        setTimeout(() => {
+          if (!!place.getIconId()) {
+            this.selectedIconName = place.getIconId();
+          }
+        });
+      });
+
     } else {
       // this.canCreateByAddress = true;
       placeForm.reset({}, {emitEvent: false});
     }
   }
 
-  onLookupClick(): void {
-    this.placesService.loadPlacesByName(this.placeForm.value.name);
+  lookupBtnTitle(): string {
+    return !!!this.placesService.fetchFilter.name ? this.lookupPlace : this.endLookup;
   }
 
-  onIconKitChange(source): void {
+  public onLookupClick(): void {
+    if (this.lookupBtnTitle() === this.lookupPlace) {
+      this.placesService.fetchFilter.name = this.placeForm.value.name;
+      this.placesService.loadPlaces();
+    } else {
+      this.placesService.fetchFilter.name = null;
+      this.placesService.loadPlaces();
+    }
+  }
 
+  public onCustomIconSetToggle(event): void {
+    this.setIconSets(event.checked);
+  }
+
+  private setIconSets(isCustom: boolean): void {
+    this.isCustomIconSet = isCustom;
+    this.place.setIsCustomIconSet(isCustom);
+    if (isCustom) {
+      this.customIconStoreService.fetchSets();
+    } else {
+      this.iconSets = ICON_TEMPLATE_SETS;
+    }
+    this.clearIcon();
+  }
+
+  public onIconSetChange(source): void {
+    this.setIconSet(source.value);
+    this.clearIcon();
+  }
+
+  private clearIcon(): void {
+    this.selectedIconName = '';
+    this.placeForm.patchValue({
+      iconName: '',
+      iconTextContent: '',
+      infoWindowContent: ''
+    }, {emitEvent: false});
+  }
+
+  private setIconSet(setId): void {
+    const set = this.iconSets.find(iconSet => iconSet.setId === setId);
+    if (!!set) {
+      this.iconSet = set.collection;
+    }
   }
 
   onIconNameChange(source): void {
+    if (this.isCustomIconSet) {
+      this.customIconStoreService.loadIcon(this.selectedIconSet, source.value, ((icon) => {
+        const holder: SvgIconHolder = {
+          iconSetId: this.selectedIconSet,
+          iconId: source.value,
+          svgText: icon
+        };
+        this.placesService.iconChanged.next(holder);
+      }));
+    } else {
+      this.placesService.loadIcon(this.selectedIconSet, source.value);
+    }
+  }
 
+  onIconContentApplyClick(): void {
+    this.svgIcon.setTextContent(this.placeForm.value.iconTextContent);
+    this.place.setMarker(this.svgIcon);
+    this.placesService.placeChanged.next(this.place);
+    this.canApplyIconContent = false;
   }
 
   onCreateByCoordinatesClick(): void {
@@ -272,12 +404,41 @@ export class PlaceComponent implements OnInit, OnDestroy, AfterViewInit {
       });
   }
 
+  private enableIconFields(enable: boolean): void {
+    if (enable) {
+      this.placeForm.controls.iconSet.enable({emitEvent: false});
+      this.placeForm.controls.iconName.enable({emitEvent: false});
+      this.placeForm.controls.infoWindowContent.enable({emitEvent: false});
+    } else {
+      this.placeForm.controls.iconSet.disable({emitEvent: false});
+      this.placeForm.controls.iconName.disable({emitEvent: false});
+      this.placeForm.controls.iconTextContent.disable({emitEvent: false});
+      this.placeForm.controls.infoWindowContent.disable({emitEvent: false});
+    }
+    this.customIconSetDisabled = !enable;
+  }
+
+  setDefaultIcon(): void {
+    this.selectedIconSet = PlacesService.defaultIconSet();
+    this.setIconSet(this.selectedIconSet);
+    this.selectedIconName = PlacesService.defaultIcon();
+    this.placeForm.patchValue({
+      iconSet: PlacesService.defaultIconSet(),
+      iconName: PlacesService.defaultIcon()
+    }, {emitEvent: false});
+  }
+
   public onFenceIdChange(source): void {
     this.selectedFenceId = source.value;
     if (!!this.selectedFenceId) {
       this.fillFencesForm(this.place, this.placeForm);
       this.placesService.placeChanged.next(this.place);
     }
+  }
+
+  onFenceVisibleChange(event): void {
+    this.fenceVisible = event.checked;
+    this.canApplyGeofence = true;
   }
 
   public onApplyGeofenceClick(): void {
@@ -293,20 +454,21 @@ export class PlaceComponent implements OnInit, OnDestroy, AfterViewInit {
       strokeWeight: this.placeForm.get('fencesForm.strokeWeight').value
     };
 
-    console.dir(geofence);
     this.selectedFenceId = fenceId;
     this.canApplyGeofence = false;
 
     this.place.setFence(fenceId, geofence);
-    this.canSave = true;
     this.placesService.placeChanged.next(this.place);
   }
 
   public onDeleteGeofenceClick(): void {
     if (!!this.place.getFences()) {
       const fenceId = this.placeForm.get('fencesForm.fenceId').value;
-      this.place.getFences().delete(fenceId);
+      this.place.deleteFence(fenceId);
       this.selectedFenceId = null;
+      this.placeForm.get('fencesForm.fenceId').setValue('');
+      this.canApplyGeofence = false;
+
       this.placesService.placeChanged.next(this.place);
     }
   }
@@ -347,6 +509,7 @@ export class PlaceComponent implements OnInit, OnDestroy, AfterViewInit {
           strokeWeight: fence.strokeWeight
         }
       }, {emitEvent: false});
+      this.fenceVisible = fence.visible;
       this.canDeleteGeofence = true;
     } else {
       this.canDeleteGeofence = false;
@@ -366,6 +529,10 @@ export class PlaceComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onSave(): void {
     if (this.canSave) {
+      if (!!!this.place.getIconSetId() && !!!this.place.getIconId()) {
+        this.place.setIconSetId(this.placeForm.controls.iconSet.value);
+        this.place.setIconId(this.placeForm.controls.iconName.value);
+      }
       this.placesService.saveUniquePlace(this.place);
     } else {
       this.dialog.open(ErrorDlgComponent, {

@@ -1,0 +1,134 @@
+<div class="icon" fxLayoutAlign="center">
+  <form fxFlex.gt-xs="400px"
+        fxLayout="column"
+        [formGroup]="iconForm">
+    <div class="heading" fxFlexAlign="center">
+      SVG Icon Editor
+    </div>
+    <div class="group mat-elevation-z4" fxLayout="column">
+      <legend>Icon Template</legend>
+      <div fxLayout="row">
+        <mat-form-field fxFlex="50">
+          <mat-label class="icon-name">Icon Set</mat-label>
+          <mat-select [(value)]="selectedIconTemplateSet"
+                      formControlName="iconTemplateSet"
+                      (selectionChange)="onIconTemplateSetChange($event)">
+            <mat-option *ngFor="let set of iconTemplateSets" [value]="set.setId">
+              {{set.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field fxFlex="50">
+          <mat-label class="icon-name">Icon</mat-label>
+          <mat-select [(value)]="selectedIconTemplate"
+                      formControlName="iconTemplate"
+                      (selectionChange)="onIconTemplateChange($event)">
+            <mat-option *ngFor="let icon of iconTemplateSet" [value]="icon.id">
+              {{icon.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="group mat-elevation-z4" fxLayout="column">
+      <legend>Icon Styling</legend>
+      <app-icon-map></app-icon-map>
+      <div fxLayout="row">
+        <mat-form-field fxFlex="50"
+                        floatLabel="always">
+          <input type="number"
+                 matInput
+                 placeholder="Scale"
+                 formControlName="scale"
+                 (change)="onScaleChange($event)">
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label class="icon-name">SVG Tag</mat-label>
+          <mat-select [(value)]="selectedSvgElement"
+                      formControlName="svgElements"
+                      (selectionChange)="onSvgTagChange($event)">
+            <mat-option *ngFor="let element of svgElements" [value]="element">
+              {{element.tagName}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <router-outlet></router-outlet>
+    </div>
+
+    <div class="group mat-elevation-z4" fxLayout="column">
+      <legend>Customized Icon</legend>
+      <div fxLayout="row">
+        <mat-form-field floatLabel="always"
+                        fxFlex="50">
+          <mat-label>Icon Set</mat-label>
+          <mat-select [(value)]="selectedCustIconSet"
+                      formControlName="selectedCustIconSet"
+                      (selectionChange)="onCustIconSetChange($event)">
+            <mat-option *ngFor="let id of custIconSets" [value]="id">
+              {{id}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field floatLabel="always"
+                        fxFlex="50">
+          <input type="text"
+                 matInput
+                 placeholder="Selected or new Icon Set"
+                 formControlName="effectiveCustIconSet"
+                 (change)="onEffectiveCustIconSetChange($event)">
+        </mat-form-field>
+      </div>
+      <div fxLayout="row">
+        <mat-form-field floatLabel="always"
+                        fxFlex="50">
+          <mat-label>Icon</mat-label>
+          <mat-select [(value)]="selectedCustIcon"
+                      formControlName="selectedCustIcon"
+                      (selectionChange)="onCustIconChange($event)">
+            <mat-option *ngFor="let id of custIcons" [value]="id">
+              {{id}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field floatLabel="always"
+                        fxFlex="50">
+          <input type="text"
+                 matInput
+                 placeholder="Selected or new Icon"
+                 formControlName="effectiveCustIcon"
+                 (change)="onEffectiveCustIconChange($event)">
+        </mat-form-field>
+      </div>
+
+      <div class="icon-buttons"
+           fxLayout="row"
+           fxLayoutAlign="space-around start">
+        <button class="icon-button"
+                mat-raised-button
+                color="primary"
+                [disabled]="!canCancel"
+                (click)="onCancel()">
+          Cancel
+        </button>
+        <button class="icon-button"
+                mat-raised-button
+                color="primary"
+                [disabled]="!canDelete"
+                (click)="onDelete()">
+          DELETE
+        </button>
+        <button class="icon-button"
+                mat-raised-button
+                color="primary"
+                [disabled]="!canSave"
+                (click)="onSave()">
+          SAVE
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+

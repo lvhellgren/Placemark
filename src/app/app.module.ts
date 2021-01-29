@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Lars Hellgren (lars@exelor.com).
+// Copyright (c) 2021 Lars Hellgren (lars@exelor.com).
 // All rights reserved.
 //
 // This code is licensed under the MIT License.
@@ -33,14 +33,16 @@ import { MatButtonModule } from '@angular/material/button';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ErrorDlgComponent } from './error-dlg/error-dlg.component';
-import { MsgDlgComponent } from './msg-dlg/msg-dlg.component';
+import { ErrorDlgComponent } from './common/error-dlg/error-dlg.component';
+import { MsgDlgComponent } from './common/msg-dlg/msg-dlg.component';
+import { InfoDlgComponent } from './common/info-dlg/info-dlg.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ErrorDlgComponent,
-    MsgDlgComponent
+    MsgDlgComponent,
+    InfoDlgComponent
   ],
   imports: [
     BrowserModule,

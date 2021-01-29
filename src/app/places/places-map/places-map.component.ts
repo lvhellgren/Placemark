@@ -4,7 +4,7 @@ import { PlacesService } from '../places.service';
 import { MapFence, Place } from '../classes/place';
 import { SubSink } from 'subsink';
 import { setBounds } from '../../common/map-common';
-import { OverlayMarker } from '../classes/overlay-marker';
+import { OverlayMarker } from '../../common/overlay-marker';
 import LatLngBoundsLiteral = google.maps.LatLngBoundsLiteral;
 
 @Component({
@@ -29,6 +29,7 @@ export class PlacesMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subSink = new SubSink();
 
+  private pendingMarkerId: string = null;
   private displayedMarkers: Map<string, google.maps.Marker | OverlayMarker> = new Map();
   private displayedFences: Map<string, Map<string, MapFence>> = new Map();
 
@@ -54,6 +55,12 @@ export class PlacesMapComponent implements OnInit, AfterViewInit, OnDestroy {
         } else {
           this.map.setCenter(null);
         }
+
+        if (!!!place.getName()) {
+          this.removeExistingMarker(this.pendingMarkerId);
+          this.pendingMarkerId = place.getId();
+        }
+
         this.displayMarker(place);
       }
     });
@@ -83,10 +90,15 @@ export class PlacesMapComponent implements OnInit, AfterViewInit, OnDestroy {
           setBounds(place.marker.getPosition().lat(), place.marker.getPosition().lng(), bounds);
         });
 
-        if (activeMarkerCount > 1) {
+        if (activeMarkerCount > 0) {
           this.map.fitBounds(bounds);
         }
       }
+    });
+
+    // Reacts to successful place savings operations
+    this.subSink.sink = this.placesService.placeSaved$.subscribe((id: string) => {
+      this.pendingMarkerId = null;
     });
   }
 
@@ -110,7 +122,7 @@ export class PlacesMapComponent implements OnInit, AfterViewInit, OnDestroy {
   private displayMarker(place: Place): void {
     this.removeExistingMarker(place.getId());
     this.displayedMarkers.set(place.getId(), place.marker.getMarkerImpl());
-    place.marker.setMap(this.map, Place.makeSvgId(place.getPosition()));
+    place.marker.setMap(this.map, Place.makePlaceId(place.getPosition()));
 
     const fences = place.getFences();
     if (!!fences && fences.size > 0) {
@@ -120,12 +132,12 @@ export class PlacesMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Removes any marker and any associated fences already existing at a location
   // where a new marker is about to be created.
-  private removeExistingMarker(id): void {
-    const marker = this.displayedMarkers.get(id);
+  private removeExistingMarker(markerId): void {
+    const marker = this.displayedMarkers.get(markerId);
     if (!!marker) {
       marker.setMap(null);
-      this.displayedMarkers.delete(id);
-      this.removeFences(id);
+      this.displayedMarkers.delete(markerId);
+      this.removeFences(markerId);
     }
   }
 
@@ -161,8 +173,8 @@ export class PlacesMapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!!mapFences) {
       Array.from(mapFences.values()).forEach((mapFence) => {
         mapFence.setMap(null);
-        const rslt = mapFences.delete(mapFence.fenceId as string);
       });
+      this.displayedFences.delete(markerId);
     }
   }
 }

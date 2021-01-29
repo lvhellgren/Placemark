@@ -12,24 +12,24 @@
            fxLayoutGap="20px"
            fxLayoutAlign="space-around end">
         <div>
-          <a href="#" mat-button
-             [routerLink]="['places']"
-             [routerLinkActive]="['active-page']"
-             matTooltip="Marked locations">
-            PLACES
-          </a>
-        </div>
-        <div>
-          <a href="#" mat-button
-             [routerLink]="['icons']"
+          <a mat-button
+             [routerLink]="['icon']"
              [routerLinkActive]="['active-page']"
              matTooltip="Icon definitions">
-            ICONS
+            ICON EDITOR
           </a>
+        </div>
+        <a mat-button
+           [routerLink]="['places']"
+           [routerLinkActive]="['active-page']"
+           matTooltip="Marked locations">
+          PLACE MARKER
+        </a>
+        <div>
         </div>
       </div>
       <div fxFlexOrder="2"
-           style="padding-right: 15px">
+           style="padding-right: 15px;">
         <button mat-icon-button matTooltip="Information" (click)="onInfoBtnClick()">
           <mat-icon>help</mat-icon>
         </button>
@@ -41,7 +41,7 @@
   </div>
   <div class="footer"
        fxFlexOrder="3">
-    lars@exelor.com
+    Copyright (c) 2021 Lars Hellgren (lars@exelor.com)
   </div>
 </div>
 

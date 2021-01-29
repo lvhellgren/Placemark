@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Lars Hellgren (lars@exelor.com).
+// Copyright (c) 2021 Lars Hellgren (lars@exelor.com).
 // All rights reserved.
 //
 // This code is licensed under the MIT License.
@@ -21,18 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import { MarkerWrapper } from './marker-wrapper';
-import { OverlayMarker } from './overlay-marker';
-import { PlaceModel } from '../../services/data-store.service';
+import { MarkerWrapper } from '../../common/marker-wrapper';
+import { PlaceModel } from '../../services/place-store.service';
+import { SvgIcon } from '../../services/svg-icon';
 import LatLng = google.maps.LatLng;
 
-export const AWESOME_ICON_SET = 'awesome-icons';
-export const EXELOR_OVERLAY_ICON_SET = 'exelor-overlay-icons';
-export const MAPKEY_ICON_SET = 'mapkey-icons';
-
-export const ICON_KITS = [];
-
-export const SVG_ID = 'SVG_ID_';
 
 export interface Geofence {
   id: string;
@@ -55,63 +48,98 @@ export class MapFence extends google.maps.Circle {
 }
 
 export class Place {
-
   private name?: string;
+  private isCustomIconSet = false;
   marker?: MarkerWrapper;
   address?: string;
-  infoWindowContent: string;
+  hasIconTextContent = false;
+  iconTextContent?: string;
+  infoWindowContent?: string;
   private fences?: Map<string, Geofence>;
 
-  scale?: number;
-  origWidth?: number;
-  origHeight?: number;
-  iconSetId?: string;
-  iconId?: string;
+  private iconSetId?: string;
+  private iconId?: string;
 
   // UI controls
-  isValid = false;
-  private touched = false;
+  private hasChanged = false;
   private saved = false;
   recenter = false;
 
-  latitude: number;
-  longitude: number;
-
-  constructor(iconSetId = null, iconId = null) {
-    this.setMarker(iconSetId, iconId);
+  constructor(private position: LatLng) {
+    this.marker = new MarkerWrapper();
+    this.marker.setPosition(this.position);
   }
 
-  static makeSvgId(position: LatLng): string {
-    return !!position ? (SVG_ID + position.lat().toString() + '_' + position.lng().toString()) : null;
-  }
-
-  static makePlaceId(lat: number, lng: number): string {
-    return lat + '/' + lng;
+  static makePlaceId(position: LatLng): string {
+    return !!position ? (position.lat().toString() + '/' + position.lng().toString()) : null;
   }
 
   public setName(name): void {
     this.name = name;
-    this.touched = true;
+    this.hasChanged = true;
   }
 
   public getName(): string {
     return this.name;
   }
 
-  public setInfoWindowContent(content: string): void {
-    this.infoWindowContent = content;
-    this.touched = true;
+  public setIsCustomIconSet(value: boolean): void {
+    this.isCustomIconSet = value;
   }
 
-  private setMarker(iconSetId: string, iconId: string): void {
+  public getIsCustomIconSet(): boolean {
+    return this.isCustomIconSet;
+  }
+
+  public getIconSetId(): string {
+    return this.iconSetId;
+  }
+
+  public setIconSetId(iconSetId: string): void {
     this.iconSetId = iconSetId;
+  }
+
+  public getIconId(): string {
+    return this.iconId;
+  }
+
+  public setIconId(iconId: string): void {
     this.iconId = iconId;
-    if (!!iconSetId && (iconSetId === AWESOME_ICON_SET || iconSetId === EXELOR_OVERLAY_ICON_SET)) {
-      this.marker = new MarkerWrapper(new OverlayMarker());
+    this.hasChanged = true;
+  }
+
+  public setIconTextContent(content: string): void {
+    this.iconTextContent = content;
+    this.hasChanged = true;
+  }
+
+  public setInfoWindowContent(content: string): void {
+    this.infoWindowContent = content;
+    this.hasChanged = true;
+  }
+
+  public setMarker(svgIcon: SvgIcon): void {
+    this.marker = new MarkerWrapper();
+    if (!!svgIcon) {
+      this.marker.setIsOverlay(svgIcon.isOverlay());
+      this.marker.setIcon(svgIcon.serialize());
+      this.marker.setIconDimensions(svgIcon.getCurrentWidth(), svgIcon.getCurrentHeight());
+      this.hasIconTextContent = svgIcon.hasTextContent();
+      if (this.hasIconTextContent) {
+        this.iconTextContent = svgIcon.getTextContent().trim();
+      }
     } else {
-      this.marker = new MarkerWrapper(new google.maps.Marker());
+      this.hasIconTextContent = false;
+      this.iconTextContent = null;
     }
-    this.marker.setPosition(new LatLng(this.latitude, this.longitude));
+    this.marker.setPosition(this.position);
+  }
+
+  public addMarkerDescriptions(map: google.maps.Map): void {
+    if (this.marker) {
+      this.marker.addMarkerDescriptions(this.infoWindowContent, map);
+      this.marker.setTitle(this.name);
+    }
   }
 
   public setFence(fenceId: string, geofence: Geofence): void {
@@ -119,11 +147,11 @@ export class Place {
       this.fences = new Map<string, Geofence>();
     }
     this.fences.set(fenceId, geofence);
-    this.touched = true;
+    this.hasChanged = true;
   }
 
   public getFenceIds(): string[] {
-    return !!this.fences ? Array.from(this.fences.keys()) : [];
+    return !!this.fences && this.fences.size > 0 ? Array.from(this.fences.keys()) : [];
   }
 
   public getFences(): Map<string, Geofence> {
@@ -136,25 +164,21 @@ export class Place {
 
   public deleteFence(id: string): void {
     this.fences.delete(id);
-    this.touched = true;
+    this.hasChanged = true;
   }
 
   public insertModel(model: PlaceModel): Place {
     this.name = model.name;
+    this.isCustomIconSet = model.isCustomIconSet;
     this.address = model.address;
+    this.iconTextContent = model.textContent;
+    this.hasIconTextContent = !!model.textContent;
     this.infoWindowContent = model.infoWindowContent;
-    this.setPosition(new LatLng(model.latitude, model.longitude));
+    this.position = new LatLng(model.latitude, model.longitude);
     this.insertFences(model.fences);
-    return this.insertConfigModel(model);
-  }
-
-  private insertConfigModel(model: PlaceModel): Place {
-    this.scale = model.scale;
-    this.origWidth = model.origWidth;
-    this.origHeight = model.origHeight;
     this.iconSetId = model.iconSetId;
     this.iconId = model.iconId;
-    this.marker.setIcon(model.svgDef);
+    this.marker.setIcon(model.svgText);
     return this;
   }
 
@@ -165,68 +189,49 @@ export class Place {
   getModel(): PlaceModel {
     const model: PlaceModel = {
       name: this.name,
+      isCustomIconSet: this.isCustomIconSet,
       address: this.address,
-      latitude: this.getPosition() ? this.getPosition().lat() : null,
-      longitude: this.getPosition() ? this.getPosition().lng() : null,
+      latitude: this.position.lat(),
+      longitude: this.position.lng(),
       fences: this.fences,
+      textContent: this.iconTextContent,
       infoWindowContent: this.infoWindowContent,
-    };
-    return {...model};
-    // return {...model, ...this.getDefaultConfig()};
-  }
-
-  getDefaultConfig(): PlaceModel {
-    const model: PlaceModel = {
-      scale: this.scale,
-      origWidth: this.origWidth,
-      origHeight: this.origHeight,
       iconSetId: this.iconSetId,
       iconId: this.iconId,
-      svgDef: this.marker.getIcon() as string
+      isOverLayMarker: this.marker.isOverlay(),
+      iconWidth: this.marker.getIconWidth(),
+      iconHeight: this.marker.getIconHeight(),
+      svgText: this.marker.getIcon() as string
     };
-    return;
+    return {...model};
   }
 
-  setPosition(position: LatLng): void {
-    this.marker.setPosition(position);
-    this.latitude = position.lat();
-    this.longitude = position.lng();
+  public getPosition(): LatLng {
+    return this.position;
   }
 
-  getPosition(): LatLng {
-    return new LatLng(this.latitude, this.longitude);
+  public getPositionId(): string {
+    return !!this.position ? Place.makePlaceId(this.getPosition()) : null;
   }
 
-  getPositionId(): string {
-    const position = this.getPosition();
-    return !!position ? Place.makePlaceId(position.lat(), position.lng()) : null;
-  }
-
-  // Checks if a place shares the location spot of this place.
-  isSameSpot(place: Place): boolean {
-    return place.getId() === this.getId();
-  }
-
-  getId(): string {
+  public getId(): string {
     return this.getPositionId();
   }
 
-  addMarkerDescriptions(map: google.maps.Map): void {
-    if (this.marker) {
-      this.marker.addMarkerDescriptions(this.infoWindowContent, map);
-      this.marker.setTitle(this.name);
-    }
-  }
-
-  public isTutched(): boolean {
-    return this.touched;
+  // Checks if a place shares the location spot of this place.
+  public isSameSpot(place: Place): boolean {
+    return place.getId() === this.getId();
   }
 
   public isSaved(value: boolean = null): boolean {
     if (value !== null) {
       this.saved = value;
-      this.touched = false;
+      this.hasChanged = false;
     }
     return this.saved;
+  }
+
+  public needsSaving(): boolean {
+    return this.hasChanged && !!this.position && !!this.name;
   }
 }

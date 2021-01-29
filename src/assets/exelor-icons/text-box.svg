@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="40" height="70" viewBox="0 0 40 70"
+     data-markerType="overlay"
+     data-origin="exelor"
+     data-icon-type="text-box"
+     data-initial-width="40"
+     data-initial-height="70"
+     data-initial-scale="0.35"
+     data-path-scale-start="0.1"
+     data-path-scale-incr="0.1"
+     data-text-length-start="70">
+  <path d="M 10.755 8.144 L 190.755 8.144 C 193.516 8.144 195.755 9.893 195.755 12.048 L 195.755 51.871 C 195.755 54.027 193.516 55.776 190.755 55.776 L 113.236 55.776 L 100.755 68.144 L 87.396 55.776 L 10.755 55.776 C 7.994 55.776 5.755 54.027 5.755 51.871 L 5.755 12.048 C 5.755 9.893 7.994 8.144 10.755 8.144 Z"
+        transform="scale(0.2, 1)"
+        style="fill: blue; stroke: white; stroke-width: 3;">
+  </path>
+  <text x="20" y="44"
+        text-anchor="middle"
+        textLength="70%"
+        lengthAdjust="spacingAndGlyphs"
+        style="fill: white; font-weight: normal; font-size: 32px;">
+  </text>
+</svg>

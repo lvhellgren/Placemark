@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="30" height="38" viewBox="0 0 200 245"
+     data-markerType="overlay"
+     data-origin="font-awesome"
+     data-icon-type="fa-droplet"
+     data-initial-scale="0.8">
+  <path d="M 196 100 C 196 118.893 190.542 136.511 181.117 151.365 C 164.094 178.193 100 240 100 240 C 100 240 34.428 177.302 17.645 149.359 C 8.982 134.936 4 118.05 4 100 C 4 46.981 46.981 4 100 4 C 153.019 4 196 46.981 196 100 Z"
+        style="fill: blue; stroke: white; stroke-width: 6;"/>
+  <svg viewBox="-242 125 1000 500" xmlns="http://www.w3.org/2000/svg">
+    <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"
+          style="fill: white;">
+      Circle
+    </path>
+  </svg>
+</svg>

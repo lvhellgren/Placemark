@@ -1,0 +1,49 @@
+<div>
+  <form fxLayout="column"
+        [formGroup]="styleForm">
+    <div fxLayout="row"
+         fxLayoutAlign="space-between center">
+      <mat-form-field fxFlex="50" floatLabel="always">
+        <input type="string"
+               matInput
+               placeholder="Fill Color"
+               formControlName="fillColor"
+               (change)="onFillColorChange($event)">
+      </mat-form-field>
+      <mat-form-field fxFlex="50" floatLabel="always">
+        <input type="number"
+               matInput
+               placeholder="Fill Opacity (0.0 - 1)"
+               formControlName="fillOpacity"
+               (change)="onFillOpacityChange($event)">
+      </mat-form-field>
+    </div>
+    <div fxLayout="row"
+         fxLayoutAlign="space-between center">
+      <mat-form-field fxFlex="50" floatLabel="always">
+        <input type="text"
+               matInput
+               placeholder="Font Size"
+               formControlName="fontSize"
+               (change)="onFontSizeChange($event)">
+      </mat-form-field>
+      <mat-form-field fxFlex="50" floatLabel="always">
+        <input type="string"
+               matInput
+               placeholder="Font Weight"
+               formControlName="fontWeight"
+               (change)="onFontWeightChange($event)">
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field fxFlex="100" floatLabel="always">
+        <input type="text"
+               matInput
+               placeholder="Text"
+               formControlName="text"
+               (change)="onTextChange($event)">
+      </mat-form-field>
+    </div>
+  </form>
+</div>
+

@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Lars Hellgren (lars@exelor.com).
+// Copyright (c) 2021 Lars Hellgren (lars@exelor.com).
 // All rights reserved.
 //
 // This code is licensed under the MIT License.
@@ -26,7 +26,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Place } from '../classes/place';
 import { SubSink } from 'subsink';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PlacesService } from '../places.service';
+import { ICON_TEMPLATE_SETS, PlacesService } from '../places.service';
 
 @Component({
   selector: 'app-places-list',
@@ -35,10 +35,13 @@ import { PlacesService } from '../places.service';
 })
 export class PlacesListComponent implements OnInit, OnDestroy {
   public dataSource = new MatTableDataSource<Place>();
-  public displayedColumns = ['name'];
+  public displayedColumns = ['select', 'name', 'iconSet', 'icon'];
+  public isAllSelectedChecked = false;
+  public isAllSelectedIndeterminate = false;
+  public selectedPlaces = new Map<string, string>();
+  public disableDelete = true;
 
   private subSink = new SubSink();
-
   private tapCount = 0;
   private place: Place = null;
 
@@ -100,5 +103,83 @@ export class PlacesListComponent implements OnInit, OnDestroy {
 
   private isSelected(place): boolean {
     return !!place && this.place ? place.getId() === this.place.getId() : false;
+  }
+
+  getPlaceId(place: Place): string {
+    return place.getId();
+  }
+
+  public getIconSetName(place: Place): string {
+    let iconSetName: string;
+    if (place.getIsCustomIconSet()) {
+      iconSetName = place.getIconSetId();
+    } else {
+      const set = ICON_TEMPLATE_SETS.find(item => item.setId === place.getIconSetId());
+      iconSetName = !!set ? set.name : 'N/A';
+    }
+    return iconSetName;
+  }
+
+  public getIconName(place: Place): string {
+    let iconName: string;
+    if (place.getIsCustomIconSet()) {
+      iconName = place.getIconId();
+    } else {
+      const set = ICON_TEMPLATE_SETS.find(item => item.setId === place.getIconSetId());
+      if (!!set) {
+        const icon = set.collection.find(item => item.id === place.getIconId());
+        iconName = icon ? icon.name : 'N/A';
+      } else {
+        console.error(`No icon set for ID: ${place.getIconSetId()}`);
+        iconName = 'N/A';
+      }
+    }
+    return iconName;
+  }
+
+  public onSelectAllChange(event): void {
+    this.isAllSelectedChecked = event.checked;
+    if (this.isAllSelectedChecked) {
+      this.dataSource.data.forEach((place) => {
+        this.selectedPlaces.set(place.getId(), '');
+      });
+      this.disableDelete = false;
+    } else {
+      this.selectedPlaces.clear();
+      this.disableDelete = true;
+    }
+  }
+
+  public onSelectRowChange(event): void {
+    if (event.checked) {
+      this.selectedPlaces.set(event.source.id, '');
+    } else {
+      this.selectedPlaces.delete(event.source.id);
+    }
+
+    this.setAllSelectedStatus();
+  }
+
+  private setAllSelectedStatus(): void {
+    if (this.selectedPlaces.size === 0) {
+      this.isAllSelectedChecked = false;
+      this.disableDelete = true;
+      this.isAllSelectedIndeterminate = false;
+    } else if (this.selectedPlaces.size === this.dataSource.data.length) {
+      this.isAllSelectedChecked = true;
+      this.isAllSelectedIndeterminate = false;
+      this.disableDelete = false;
+    } else {
+      this.isAllSelectedIndeterminate = true;
+      this.disableDelete = false;
+    }
+  }
+
+  public onDeletePlacesClick(): void {
+    this.selectedPlaces.forEach((value, key) => {
+      this.placesService.deletePlaceById(key);
+    });
+    this.selectedPlaces.clear();
+    this.setAllSelectedStatus();
   }
 }

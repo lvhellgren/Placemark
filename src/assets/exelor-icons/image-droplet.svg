@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="40" height="50" viewBox="0 0 200 245"
+     data-markerType="overlay"
+     data-origin="exelor"
+     data-icon-type="image-droplet"
+     >
+  <defs>
+    <clipPath id="circlePort">
+      <circle cx="100" cy="100" r="83"/>
+    </clipPath>
+  </defs>
+  <path class="image-droplet-path"
+        d="M 196 100 C 196 118.893 190.542 136.511 181.117 151.365 C 164.094 178.193 100 240 100 240 C 100 240 34.428 177.302 17.645 149.359 C 8.982 134.936 4 118.05 4 100 C 4 46.981 46.981 4 100 4 C 153.019 4 196 46.981 196 100 Z"
+        style="fill: blue; stroke: white; stroke-width: 3;"/>
+  <circle cx="100" cy="100" r="87"
+          style="fill: white;"/>
+  <image xlink:href="/assets/images/birds.jpg"
+         clip-path="url(#circlePort)"
+         style="x: -35; y: -40; width: 300px; height: 300px;"/>
+</svg>

@@ -4,6 +4,10 @@
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
+    "types": [
+      "googlemaps",
+      "node"
+    ],
     "sourceMap": true,
     "declaration": false,
     "downlevelIteration": true,
