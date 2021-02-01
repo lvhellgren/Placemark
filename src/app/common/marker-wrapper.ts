@@ -76,6 +76,9 @@ export class MarkerWrapper {
         const prefix = svgText.startsWith('data') ? '' : 'data:image/svg+xml;utf-8, ';
         (this.marker as Marker).setIcon({url: prefix + svgText});
       }
+    } else {
+      (this.marker as OverlayMarker).setIcon(null);
+      (this.marker as Marker).setIcon(null);
     }
   }
 

@@ -289,10 +289,7 @@ export class IconComponent implements OnInit, AfterViewInit, OnDestroy {
     if (set.length > 0 && icon.length > 0) {
       this.iconService.saveIcon(set, icon, this.svgIcon.serialize(), (success: boolean) => {
         if (success) {
-          this.selectedCustIcon = '';
-          this.iconForm.patchValue({
-            selectedCustIcon: ''
-          }, {emitEvent: false});
+          this.clearCustomIcon();
           this.dialog.open(MsgDlgComponent, {
             data: {
               title: 'Success',

@@ -53,7 +53,7 @@ export class AppComponent {
 
         <p>Customized icons are stored in sets.</p>
 
-        <p>To save a new icon, either select in existing set or specify a new set name in the <i>Customized Icon</i> panel. Then, enter a name for
+        <p>To save a new icon, either select in existing set or specify a new set name in the <i>Customized Icon</i> panel, then enter a name for
         the new icon and click the <b>SAVE</b> button. <b>Note that this demo application saves the icons in <i>localstorage</i> only</b>,
         so the icons are available only to applications running in the browser.</p>
 
@@ -74,7 +74,7 @@ export class AppComponent {
         Icon Set</i> checkbox to toggle between your previously created custom icons and server template icons.</p>
         <p>In order to save the place in <i>localstorage</i> (for now) the <i>Name</i> must be specified. Use the <i>Lookup Place</i> to search
         for places sharing the same name.</p>
-        <p>Geofences can be defined for the place once the place name is assigned.</p>
+        <p>Geofences can be defined for a place once the place name is assigned.</p>
         </p>
 
         `;
