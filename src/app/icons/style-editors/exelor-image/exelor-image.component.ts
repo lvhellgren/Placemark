@@ -21,18 +21,87 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { IconService } from '../../icon.service';
+import { SubSink } from 'subsink';
+import { ElementStyling } from '../../classes/element-styling';
 
 @Component({
   selector: 'app-exelor-image',
   templateUrl: './exelor-image.component.html',
   styleUrls: ['./exelor-image.component.css']
 })
-export class ExelorImageComponent implements OnInit {
+export class ExelorImageComponent implements OnInit, OnDestroy, AfterViewInit {
+  public styleForm: FormGroup;
 
-  constructor() { }
+  private element: SVGImageElement;
+  private elementStyling: ElementStyling;
+  private subSink = new SubSink();
+
+  constructor(private iconService: IconService,
+              private fb: FormBuilder) {
+    this.styleForm = this.fb.group({
+      image: [],
+      x: [],
+      y: [],
+      width: [],
+      height: []
+    });
+  }
 
   ngOnInit(): void {
   }
 
+  ngAfterViewInit(): void {
+    // Reacts to an element style attribute having been selected
+    this.subSink.sink = this.iconService.iconImageSelected$.subscribe((element: SVGImageElement) => {
+      this.element = element;
+      if (!!element) {
+        this.elementStyling = new ElementStyling(element.getAttribute('style'));
+        const styleMap = this.elementStyling.getStyleMap();
+        this.styleForm.patchValue({
+          image: this.element.getAttribute('xlink:href'),
+          x: styleMap.get('x'),
+          y: styleMap.get('y'),
+          width: styleMap.get('width'),
+          height: styleMap.get('height')
+        }, {emitEvent: false});
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.subSink.unsubscribe();
+  }
+
+  public onImageChange({target}): void {
+    this.element.setAttribute('xlink:href', target.value);
+    this.iconService.styleChanged.next();
+    console.dir(target.value);
+  }
+
+  public onXChange({target}): void {
+    this.elementStyling.setStyleItem('x', target.value);
+    this.element.setAttribute('style', this.elementStyling.getStyle());
+    this.iconService.styleChanged.next();
+  }
+
+  public onYChange({target}): void {
+    this.elementStyling.setStyleItem('y', target.value);
+    this.element.setAttribute('style', this.elementStyling.getStyle());
+    this.iconService.styleChanged.next();
+  }
+
+  public onWidthChange({target}): void {
+    this.elementStyling.setStyleItem('width', target.value);
+    this.element.setAttribute('style', this.elementStyling.getStyle());
+    this.iconService.styleChanged.next();
+  }
+
+  public onHeightChange({target}): void {
+    this.elementStyling.setStyleItem('height', target.value);
+    this.element.setAttribute('style', this.elementStyling.getStyle());
+    this.iconService.styleChanged.next();
+  }
 }

@@ -1,1 +1,51 @@
-<p>Sorry, Exelor Image Droplet editing is yet to be completed.</p>
+<div>
+  <form fxLayout="column"
+        [formGroup]="styleForm">
+    <div fxLayout="row"
+         fxLayoutAlign="space-between center">
+      <mat-form-field fxFlex="100" floatLabel="always">
+        <input type="string"
+               matInput
+               placeholder="Image"
+               formControlName="image"
+               (change)="onImageChange($event)">
+      </mat-form-field>
+    </div>
+    <div fxLayout="row"
+         fxLayoutAlign="space-between center">
+      <mat-form-field fxFlex="50" floatLabel="always">
+        <input type="number"
+               matInput
+               placeholder="Horizontal Offset"
+               formControlName="x"
+               (change)="onXChange($event)">
+      </mat-form-field>
+      <mat-form-field fxFlex="50" floatLabel="always">
+        <input type="number"
+               matInput
+               placeholder="Vertical Offset"
+               formControlName="y"
+               (change)="onYChange($event)">
+      </mat-form-field>
+    </div>
+    <div fxLayout="row"
+         fxLayoutAlign="space-between center">
+      <mat-form-field fxFlex="50" floatLabel="always">
+        <input type="number"
+               matInput
+               placeholder="Width"
+               formControlName="width"
+               (change)="onWidthChange($event)">
+      </mat-form-field>
+      <mat-form-field fxFlex="50" floatLabel="always">
+        <input type="number"
+               matInput
+               placeholder="Height"
+               formControlName="height"
+               (change)="onHeightChange($event)">
+      </mat-form-field>
+    </div>
+  </form>
+</div>
+
+

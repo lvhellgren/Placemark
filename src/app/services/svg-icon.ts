@@ -194,6 +194,10 @@ export class SvgIcon {
     return elements;
   }
 
+  public getImageElement(): SVGImageElement {
+    return this.imageElement;
+  }
+
   public hasTextContent(): boolean {
     return !!this.textElement && !!this.iconType && this.iconType.includes('text');
   }
