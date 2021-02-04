@@ -69,6 +69,10 @@ export class IconService {
   public iconSvgSelected = new BehaviorSubject<Element>(null);
   public iconSvgSelected$ = this.iconSvgSelected.asObservable();
 
+  // Informs observers that an icon image element is selected for styling
+  public iconImageSelected = new BehaviorSubject<Element>(null);
+  public iconImageSelected$ = this.iconImageSelected.asObservable();
+
   constructor(private templateIconStoreService: TemplateIconStoreService,
               private customIconStoreService: CustomIconStoreService) {
   }

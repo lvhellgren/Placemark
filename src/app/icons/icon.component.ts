@@ -183,7 +183,7 @@ export class IconComponent implements OnInit, AfterViewInit, OnDestroy {
         this.iconService.iconTextSelected.next(source.value);
         route = 'text-element';
       } else if (tag === 'image') {
-        this.iconService.iconTextSelected.next(source.value);
+        this.iconService.iconImageSelected.next(source.value);
         route = 'exelor-image';
       } else if (tag === 'svg') {
         this.iconService.iconSvgSelected.next(source.value);
